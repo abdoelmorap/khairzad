@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "233506312216",
+    "project_id": "quran-8c86e",
+    "storage_bucket": "quran-8c86e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233506312216:android:9b42c1b4495720d9e7336d",
+        "android_client_info": {
+          "package_name": "com.ana.muslim.ana_almuslim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "233506312216-mk9eueeprimkeus5ucha7i7ed8i0do2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdBruJzscZyXKrmHWozw644UdwQVzYsw0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "233506312216-mk9eueeprimkeus5ucha7i7ed8i0do2m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
