@@ -39,7 +39,16 @@ class RepoHttpSer {
     var response = await http.get(url);
     return response.body;
   }
-
+  Future<String> GetRandomHadith() async {
+    var url = Uri.parse("http://api.alquran.cloud/v1/surah");
+    var response = await http.get(url,headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      "X-API-Key":"SqD712P3E82xnwOAEOkGd5JZH8s9wRR24TqNFzjk"
+    }
+    );
+    return response.body;
+  }
   Future<String> prayTime() async {
     String country = "";
     String city = "";
@@ -83,7 +92,10 @@ class RepoHttpSer {
         country = (json.decode(response.body)['location']['country']['code']);
         city = (json.decode(response.body)['location']['city']);
       } else {
-        throw Exception('Failed to get user country from IP address');
+
+        // throw Exception('Failed to get user country from IP address');
+     country="EG";
+     city="Cairo";
       }
     }
     log(country!);

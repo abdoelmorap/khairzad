@@ -8,12 +8,11 @@ import 'package:ana_almuslim/const.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:intl/intl.dart';
+import 'package:kr_paginate_firestore/paginate_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Posts extends StatelessWidget {
@@ -347,7 +346,7 @@ class ChatScreenState extends State<ChatScreen> {
             Container(
                 child: // List of messages
                     // buildListMessage(),
-                    PaginateFirestore(
+                KrPaginateFirestore(
                   //item builder type is compulsory.
                   itemBuilder: (context, documentSnapshot, index) {
                     final data = documentSnapshot[index].data() as Map;

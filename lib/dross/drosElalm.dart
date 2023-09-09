@@ -359,15 +359,15 @@ class DetailsScreenState extends State<DetailsScreen> {
           ),
         ),
       ),
-      body: WebView(
-        initialUrl: 'about:blank',
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          _controller = webViewController;
-
-          _loadHtmlFromAssets();
-        },
-      ),
+      // body: WebView(
+      //   initialUrl: 'about:blank',
+      //   javascriptMode: JavascriptMode.unrestricted,
+      //   onWebViewCreated: (WebViewController webViewController) {
+      //     _controller = webViewController;
+      //
+      //     _loadHtmlFromAssets();
+      //   },
+      // ),
     );
   }
 
@@ -384,9 +384,9 @@ class DetailsScreenState extends State<DetailsScreen> {
     var fontCss =
         'blockquote{    font-size: 50px;} h1{    font-size: 80px;} body{ font-size: 50px;}';
     var finalstyle = '<style>$fontCss</style>$fileText';
-    _controller!.loadUrl(Uri.dataFromString(finalstyle,
-            mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
-        .toString());
+    // _controller!.loadUrl(Uri.dataFromString(finalstyle,
+    //         mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
+    //     .toString());
   }
 }
 

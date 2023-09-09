@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comment_box/comment/comment.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:paginate_firestore/paginate_firestore.dart';
+import 'package:kr_paginate_firestore/paginate_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ComentsPage extends StatefulWidget {
@@ -113,10 +113,10 @@ class _TestMeState extends State<ComentsPage> {
       ),
       body: Container(
         child: CommentBox(
-          userImage:
-              "https://iconape.com/wp-content/png_logo_vector/avatar-10.png",
+          userImage:NetworkImage(
+              "https://iconape.com/wp-content/png_logo_vector/avatar-10.png"),
           // userImage:"avatar/${ prefs.getString('avatar') ?? 'free1.jpg'}",
-          child: PaginateFirestore(
+          child: KrPaginateFirestore(
             // orderBy is compulsory to enable pagination
             query: FirebaseFirestore.instance
                 .collection('Posts')

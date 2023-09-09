@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 import 'Blocs/prayTimesBlocs/MainBloc.dart';
 
@@ -19,7 +21,8 @@ class PrayTimePage extends StatefulWidget {
 
 class _PrayTimePageState extends State<PrayTimePage> {
   MainBloc? mainBloc;
-
+  late SharedPreferences preferences;
+  int Dindex=1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +109,7 @@ class _PrayTimePageState extends State<PrayTimePage> {
                     SizedBox(
                       height: 50,
                     ),
+
                     GestureDetector(
                       child: Card(
                           margin: EdgeInsets.symmetric(
@@ -285,7 +289,31 @@ class _PrayTimePageState extends State<PrayTimePage> {
               }
             })),
           )
-        ],
+      ,Positioned(child:    Row(children: [
+            ToggleSwitch(
+              minWidth: 90.0,
+              cornerRadius: 20.0,
+              activeBgColors: [[Colors.green[800]!], [Colors.red[800]!]],
+              activeFgColor: Colors.white,
+              inactiveBgColor: Colors.grey,
+              inactiveFgColor: Colors.white,
+              initialLabelIndex: Dindex,
+              totalSwitches: 2,
+              labels: const ['تشغيل', 'إيقاف'],
+              radiusStyle: true,
+              onToggle: (index) {
+
+                  Dindex=index!;
+                  SetPrefrenss(index);
+
+                print('switched to: $index');
+              },
+            ),     const SizedBox(width: 10,),  Text("تشغيل المؤذن في التطبيق",
+              style: GoogleFonts.marhey(fontSize: 15,fontWeight: FontWeight.bold
+              ),),
+
+          ],),
+            top: 50,right: 20,),  ],
       ),
     );
   }
@@ -294,5 +322,18 @@ class _PrayTimePageState extends State<PrayTimePage> {
   void initState() {
     mainBloc = BlocProvider.of<MainBloc>(context);
     BlocProvider.of<MainBloc>(context).add(startEvent());
+    GetSolmRate();
+  }
+void SetPrefrenss(i){
+  preferences.setInt("AzanEnabled",i);
+}
+
+  void GetSolmRate() async{
+    preferences=await SharedPreferences.getInstance();
+    Dindex = preferences.getInt("AzanEnabled")??1;
+    setState(() {
+
+    });
   }
 }
+

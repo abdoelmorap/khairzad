@@ -2,15 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+// import 'package:flutter_tts/flutter_tts.dart';
 
+import 'package:ana_almuslim/QuranAudioGenrator.dart';
 import 'package:ana_almuslim/json/jsonSaver.dart';
 import 'package:ana_almuslim/model/fahresModel.dart';
 import 'package:ana_almuslim/model/modelQuranTranslate.dart';
 import 'package:ana_almuslim/model/quranModelData.dart';
 import 'package:ana_almuslim/pagemoreQuran.dart';
 import 'package:ana_almuslim/repo/repo.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,6 +24,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as pathservices;
+import 'package:show_more_text_popup/show_more_text_popup.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:flutter/widgets.dart';
@@ -39,11 +44,12 @@ class InvertColors extends StatelessWidget {
 }
 
 class SurahView extends StatefulWidget {
-  const SurahView({Key? key, required this.title, required this.index})
+  const SurahView({Key? key, required this.title, required this.index,this.markAya=0})
       : super(key: key);
 
   final String title;
   final int index;
+  final int markAya;
 
   @override
   State<SurahView> createState() => _SurahViewState();
@@ -52,9 +58,19 @@ class SurahView extends StatefulWidget {
 class _SurahViewState extends State<SurahView> {
   TextEditingController word = TextEditingController();
   var pagerIndex = 0;
+  int SelectedAya=0;
+  int SelectedayaNum=0;
+  String Selectedaya='';
+  List<Map> list=[];
+
+  bool singlePlay=false;
+  List<int> codelist=[];
   String juz = "";
+
+  Color  CurrentColor =Colors.transparent;
   List<AudioSource> ayats = [];
   late Database db;
+late Offset postion =Offset(0, 0);
   @override
   void dispose() async {
     player.dispose();
@@ -138,8 +154,14 @@ class _SurahViewState extends State<SurahView> {
                         ),
                         child: Stack(
                           alignment: Alignment(0, 0),
-                          overflow: Overflow.visible,
+                          // overflow: Overflow.visible,
                           children: <Widget>[
+                            Positioned(child: GestureDetector(
+                              child: Icon(Icons.book),
+                              onTap: () async{
+// await FlutterTts().speak("Hello World");
+                              },
+                            )),
                             Image.asset(
                               "assets/quran/page_bg.png",
                               height: MediaQuery.of(context).size.height,
@@ -295,17 +317,129 @@ class _SurahViewState extends State<SurahView> {
             //   color: Colors.black,
             // ),
 
+
             CarouselSlider.builder(
                 carouselController: buttonCarouselController,
                 itemCount: 604,
                 itemBuilder:
                     (BuildContext context, int itemIndex, int pageViewIndex) {
+
                   return Container(
                     child: InvertColors(
-                      child: Image.asset(
-                        "assets/quran/p${itemIndex + 1}.png",
-                        fit: BoxFit.fill,
-                      ),
+                      child:
+
+                      Stack(children: [
+                        Image.asset(
+                          "assets/quran/p${itemIndex + 1}.png",
+                          fit: BoxFit.fill,
+                          height: double.maxFinite,
+                        ),
+
+                        Padding(padding: const EdgeInsets.fromLTRB(8, 10, 2, 5),child:
+                        StreamBuilder(stream: player.currentIndexStream,
+                          builder: (ctx,curntIndex){
+                            List<TextSpan> aya=   list
+                                .map((e) {
+                              int ayaNum =e['aya_num'];
+
+                              if (ayaNum ==1){
+
+                                return TextSpan(text:"\n"+e['aya']+'    '
+                                    , recognizer: TapGestureRecognizer()
+                                      ..onTapUp = (t) { print('Tap Here onTap');}
+                                    ,
+
+                                    style:const TextStyle(
+                                        fontFamily: 'Othmani',
+                                        fontSize: 21,fontWeight: FontWeight.bold,color: Colors.transparent,backgroundColor: Colors.white)
+                                );
+                              }else {
+
+                                return
+
+                                TextSpan(
+                                    text:e['aya']+'       ',
+                                   onExit: (pointer){
+
+
+                                    },
+                                    recognizer:
+                                    TapGestureRecognizer()..onTapUp = (t) {
+
+
+if(postion ==Offset(0, 0)) {
+
+   codelist=[e['aya_num'],e['sura_num']];
+  SelectedAya = e['id_quran_ayat'];
+  SelectedayaNum = ayaNum;
+  Selectedaya = e['aya'];
+  postion = t.globalPosition;
+}else {
+  postion = Offset(0, 0);
+  SelectedayaNum = 0;
+}
+
+  CurrentColor=Colors.white.withOpacity(.5);
+
+  setState(() {
+
+});
+                                  print('Tap ${SelectedAya}  Here onTap ${e['aya']}');
+                                  },
+
+                                    style: TextStyle(height: MediaQuery.of(context).size.height/310,
+                                        fontFamily: 'Othmani',
+                                        fontSize: MediaQuery.of(context).size.aspectRatio*40,fontWeight: FontWeight.bold,color: Colors.transparent
+                                        ,backgroundColor:
+
+                                        singlePlay?SelectedayaNum==ayaNum?CurrentColor:
+                                        widget.markAya==0?((SelectedayaNum==ayaNum||curntIndex.data==e['aya_num']-list[0]['aya_num']) && singlePlay==false? CurrentColor:Colors.transparent           )
+                                    :Colors.transparent:SelectedayaNum==ayaNum||curntIndex.data==e['aya_num']-list[0]['aya_num']? CurrentColor:Colors.transparent)
+                                );}})
+                                .toList(); //
+                            return Container(child:
+                            AutoSizeText.rich(
+                                TextSpan(children: aya,)
+                                ,textAlign: TextAlign.justify,textDirection:TextDirection.rtl
+
+
+                            ),height: MediaQuery.of(context).size.height-150,);
+
+                          },)),
+                        (postion.dx != 0 && postion.dy != 0 )?  Positioned(child: Card(child:
+                        Row(children: [
+
+                          IconButton(onPressed: () async{
+                            print("object");
+
+ singlePlay=true;
+ setState(() {
+
+                            });
+                            await player.setUrl(
+                                await QuranAudio().AyatWithApiSingle(SelectedAya));
+
+                            // await player.setUrl(
+                            //     'https://cdn.islamic.network/quran/audio/64/ar.alafasy/${SelectedAya}.mp3');
+                            player.play().then((value) {
+
+                            });
+
+                          }, icon: Icon(Icons.volume_up_outlined)),
+                          Container(color: Colors.black,height: 10,width: 1,),
+                          IconButton(onPressed: (){
+
+                            Clipboard.setData(ClipboardData(text: Selectedaya));
+
+                            Fluttertoast.showToast(
+                                msg: 'اضيف الي الحافظة',
+                                backgroundColor: Colors.black,
+                                textColor: Colors.red);
+                          }, icon: Icon(Icons.copy))
+                        ],),)
+                          , left: postion.dx,
+                          top: postion.dy-40,
+                        ):SizedBox(width: 0,height: 0,),   ],)
                     ),
                     margin: EdgeInsets.fromLTRB(0, 65, 0, 65),
                   );
@@ -322,7 +456,7 @@ class _SurahViewState extends State<SurahView> {
                   onPageChanged: (indx, cts) async {
                     print(indx);
                     pagerIndex = indx;
-                    List<Map> list = await db.rawQuery(
+                    list = await db.rawQuery(
                         'SELECT * FROM quran where page_aya = ${indx + 1}');
                     juz = (list[0]['juz'].toString());
                     setState(() {});
@@ -436,6 +570,7 @@ class _SurahViewState extends State<SurahView> {
                             ),
                             left: 60,
                           ),
+
                           Positioned(
                             child: StreamBuilder<PlayerState>(
                                 stream: player.playerStateStream,
@@ -463,6 +598,8 @@ class _SurahViewState extends State<SurahView> {
                                       tooltip: 'play',
                                       heroTag: "btn21",
                                       onPressed: () async {
+                                        singlePlay=false;
+
                                         var playing =
                                             player.playerState.playing;
                                         print("$playing");
@@ -471,19 +608,25 @@ class _SurahViewState extends State<SurahView> {
                                             iconmedial =
                                                 Icons.now_widgets_outlined;
                                           });
-                                          var surah = await RepoHttpSer()
-                                              .getafasyByPage(
-                                                  (pagerIndex + 1).toString());
-                                          print(surah);
-                                          ayats = [];
-                                          for (var e in quranModelData
-                                              .fromJson(json.decode(surah))
-                                              .data!
-                                              .ayahs!) {
-                                            ayats.add(AudioSource.uri(
-                                                Uri.parse(e.audio!)));
-                                            print(e.audio);
-                                          }
+                                          // var surah = await RepoHttpSer()
+                                          //     .getafasyByPage(
+                                          //         (pagerIndex + 1).toString());
+                                          // print(surah);
+                                          ayats =
+                                              (       await QuranAudio().AyatWithApi(list!.first['page_aya']!))
+        .map((e) {
+          return
+            AudioSource.uri(
+                Uri.parse(
+e
+                    ));
+    }).toList();
+//                                           for (var e in list) {
+//                                             ayats.add(
+//                                             AudioSource.uri(
+//                                                 Uri.parse(   await QuranAudio().AyatWithApi(e['page_aya']))));
+//
+//                                           }
                                           setState(() {
                                             iconmedial = Icons.download;
                                           });
@@ -506,10 +649,14 @@ class _SurahViewState extends State<SurahView> {
                                                 Duration.zero, // default
                                           );
 
-                                          player.play().then((value) => () {});
+                                          player.play().then((value) => () {
+
+                                          });
+
                                           setState(() {
                                             iconmedial = Icons.play_circle_fill;
                                           });
+
                                         }
                                       },
                                       child: Icon(
@@ -519,6 +666,8 @@ class _SurahViewState extends State<SurahView> {
                                     );
                                   } else if (processingState !=
                                       ProcessingState.completed) {
+                                    singlePlay=false;
+
                                     return FloatingActionButton(
                                       child: const Icon(
                                         Icons.pause,
@@ -528,17 +677,77 @@ class _SurahViewState extends State<SurahView> {
                                       heroTag: "btn21",
                                       onPressed: player.pause,
                                     );
-                                  } else {
-                                    return FloatingActionButton(
-                                      child: const Icon(
-                                        Icons.refresh_sharp,
-                                        size: 30,
-                                      ),
-                                      tooltip: 'play',
-                                      heroTag: "btn211",
-                                      onPressed: () =>
-                                          player.seek(Duration.zero),
-                                    );
+                                  } else{
+                                  singlePlay=false;
+                                  return FloatingActionButton(
+                                    tooltip: 'play',
+                                    heroTag: "btn21",
+                                    onPressed: () async {
+
+                                      var playing =
+                                          player.playerState.playing;
+                                      print("$playing");
+                                      if (!playing) {
+                                        setState(() {
+                                          iconmedial =
+                                              Icons.now_widgets_outlined;
+                                        });
+                                        // var surah = await RepoHttpSer()
+                                        //     .getafasyByPage(
+                                        //         (pagerIndex + 1).toString());
+                                        // print(surah);
+                                        ayats =
+                                            (       await QuranAudio().AyatWithApi(list!.first['page_aya']!))
+                                                .map((e) {
+                                              return
+                                                AudioSource.uri(
+                                                    Uri.parse(
+                                                        e
+                                                    ));
+                                            }).toList();
+//                                           for (var e in list) {
+//                                             ayats.add(
+//                                             AudioSource.uri(
+//                                                 Uri.parse(   await QuranAudio().AyatWithApi(e['page_aya']))));
+//
+//                                           }
+                                        setState(() {
+                                          iconmedial = Icons.download;
+                                        });
+                                        await player.setAudioSource(
+                                          ConcatenatingAudioSource(
+                                            // Start loading next item just before reaching it.
+                                            useLazyPreparation:
+                                            true, // default
+                                            // Customise the shuffle algorithm.
+                                            shuffleOrder:
+                                            DefaultShuffleOrder(), // default
+                                            // Specify the items in the playlist.
+                                            children: ayats,
+                                          ),
+                                          // Playback will be prepared to start from track1.mp3
+                                          initialIndex: 0,
+                                          // default
+                                          // Playback will be prepared to start from position zero.
+                                          initialPosition:
+                                          Duration.zero, // default
+                                        );
+
+                                        player.play().then((value) => () {
+
+                                        });
+
+                                        setState(() {
+                                          iconmedial = Icons.play_circle_fill;
+                                        });
+
+                                      }
+                                    },
+                                    child: Icon(
+                                      iconmedial,
+                                      size: 30,
+                                    ),
+                                  );
                                   }
                                 }),
                             left: 0,
@@ -693,7 +902,10 @@ class _SurahViewState extends State<SurahView> {
     }
     return smallist;
   }
-}
+
+
+  }
+
 
 class SuggestionsModel {
   String aya;

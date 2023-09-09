@@ -127,10 +127,10 @@ List<Widget> items(List<Zikr> _zikr, context) {
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width - 50,
-                    margin: EdgeInsets.fromLTRB(70, 5, 5, 10),
+                    margin: EdgeInsets.fromLTRB(20, 5, 5, 10),
                     child: Text(
                       zikr.title != '2' ? zikr.contents : "",
-                      style: GoogleFonts.cairo(fontSize: 18),
+                      style: GoogleFonts.amiriQuran(fontSize: 28,fontWeight: FontWeight.bold),
                       textAlign: TextAlign.right,
                     ),
                   ),

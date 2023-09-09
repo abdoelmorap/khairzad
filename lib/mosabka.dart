@@ -151,7 +151,7 @@ class _MosabpkaViewState extends State<MosabpkaView> {
                             ),
                             child: Stack(
                               alignment: Alignment(0, 0),
-                              overflow: Overflow.visible,
+                              // overflow: Overflow.visible,
                               children: [
                                 Positioned(
                                   child: Container(
@@ -386,11 +386,11 @@ class _MosabpkaViewState extends State<MosabpkaView> {
     return Container(
       height: 50.0,
       margin: EdgeInsets.all(10),
-      child: RaisedButton(
+      child: ElevatedButton(
         onPressed: myonPressed,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
-        padding: EdgeInsets.all(0.0),
+        // shape:
+        //     RoundedRectangleBorder(borderRadius: BorderRadius.circular(80.0)),
+        // padding: EdgeInsets.all(0.0),
         child: Ink(
           decoration: BoxDecoration(
               gradient: LinearGradient(

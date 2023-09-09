@@ -24,6 +24,8 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
+import 'QuranAudioGenrator.dart';
+
 class SurahMoreDetails extends StatefulWidget {
   const SurahMoreDetails(
       {Key? key, required this.title, required this.index, required this.list})
@@ -62,10 +64,11 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
         ),
         body: SafeArea(
             child: Container(
+
           child: ListView.builder(
             itemBuilder: (ctx, indx) {
               void oncopy(text) {
-                Clipboard.setData(ClipboardData(text: text));
+                Clipboard.setData(ClipboardData(text: text,));
 
                 Fluttertoast.showToast(
                     msg: 'اضيف الي الحافظة',
@@ -84,36 +87,7 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                   margin: EdgeInsets.all(10),
                   child: InputDecorator(
                       decoration: InputDecoration(
-                        prefixIcon: Column(
-                          children: [
-                            GestureDetector(
-                              child: Icon(
-                                Icons.share,
-                                color: Colors.red,
-                              ),
-                              onTap: () => onshare(
-                                  widget.list[indx]['aya'].toString() +
-                                      "(وتفسيرها) " +
-                                      widget.list[indx]['tafsir_moysar']
-                                          .toString()),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            GestureDetector(
-                              child: Icon(
-                                Icons.copy,
-                                color: Colors.deepPurpleAccent,
-                              ),
-                              onTap: () => oncopy(
-                                  widget.list[indx]['aya'].toString() +
-                                      "(وتفسيرها) " +
-                                      widget.list[indx]['tafsir_moysar']
-                                          .toString()),
-                            ),
-                          ],
-                        ),
-                        labelText:
+                         labelText:
                             'الاية رقم : ${widget.list[indx]['aya_num']} سورة : ${widget.list[indx]['sura']}',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -156,8 +130,12 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                       ),
                                       onTap: () async {
                                         log("AudioStart");
+                                        // await player.setUrl(
+                                        //     'https://cdn.islamic.network/quran/audio/64/ar.alafasy/${widget.list[indx]['id_quran_ayat']}.mp3');
+
                                         await player.setUrl(
-                                            'https://cdn.islamic.network/quran/audio/64/ar.alafasy/${widget.list[indx]['id_quran_ayat']}.mp3');
+                                            await QuranAudio().AyatWithApiSingle(widget.list[indx]['id_quran_ayat']));
+
                                         player.play();
                                       },
                                     ),
@@ -174,7 +152,8 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                               ),
                               child: Text(
                                 widget.list[indx]['aya'].toString(),
-                                style: GoogleFonts.tajawal(fontSize: 18),
+                                style: GoogleFonts.amiriQuran(fontSize: 28,fontWeight:FontWeight.w600),
+                                textAlign: TextAlign.right,
                               ),
                             ),
                           ),
@@ -182,7 +161,16 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                             margin: EdgeInsets.all(10),
                             child: InputDecorator(
                               decoration: InputDecoration(
-                                suffixIcon: Column(
+
+                                labelText:
+                                    'تفسير الميسر الاية رقم : ${widget.list[indx]['aya_num']} سورة : ${widget.list[indx]['sura']}',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              child: Column(children: [
+
+                                Row(
                                   children: [
                                     GestureDetector(
                                       child: Icon(
@@ -190,7 +178,7 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                         color: Colors.deepPurple,
                                       ),
                                       onTap: () => onshare(widget.list[indx]
-                                              ['tafsir_moysar']
+                                      ['tafsir_moysar']
                                           .toString()),
                                     ),
                                     SizedBox(
@@ -202,23 +190,45 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                         color: Colors.blue,
                                       ),
                                       onTap: () => oncopy(widget.list[indx]
-                                              ['tafsir_moysar']
+                                      ['tafsir_moysar']
                                           .toString()),
                                     ),
                                   ],
+                                ), SizedBox(height: 10,),Text(
+                                  widget.list[indx]['tafsir_moysar'].toString(),
+                                  style:  GoogleFonts.jomhuria(fontSize: 26,fontWeight: FontWeight.w100),  textAlign: TextAlign.right,
                                 ),
-                                labelText:
-                                    'تفسير الميسر الاية رقم : ${widget.list[indx]['aya_num']} سورة : ${widget.list[indx]['sura']}',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
-                              child: Text(
-                                widget.list[indx]['tafsir_moysar'].toString(),
-                                style: GoogleFonts.tajawal(fontSize: 18),
-                              ),
+                              ],)
                             ),
-                          ),
+                          ), Row(
+                            children: [SizedBox(width: 10,),
+                              GestureDetector(
+                                child: Icon(
+                                  Icons.share,
+                                  color: Colors.red,
+                                ),
+                                onTap: () => onshare(
+                                    widget.list[indx]['aya'].toString() +
+                                        "(وتفسيرها) " +
+                                        widget.list[indx]['tafsir_moysar']
+                                            .toString()),
+                              ),
+                              SizedBox(
+                                height: 10,width: 20,
+                              ),
+                              GestureDetector(
+                                child: Icon(
+                                  Icons.copy,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                                onTap: () => oncopy(
+                                    widget.list[indx]['aya'].toString() +
+                                        "(وتفسيرها) " +
+                                        widget.list[indx]['tafsir_moysar']
+                                            .toString()),
+                              ),
+                            ],
+                          ),SizedBox(height: 15,),
                           ExpansionTile(
                               title: Text(
                                 "المزيد",
@@ -259,32 +269,15 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                       ),
                                     ),
                                     child: Text(widget.list[indx]['ma3ny_aya']
-                                        .toString()),
+                                        .toString(),style: GoogleFonts.cairoPlay(fontSize: 21,fontWeight: FontWeight.w800),
+                                      textAlign: TextAlign.right,),
                                   ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.all(10),
                                   child: InputDecorator(
                                     decoration: InputDecoration(
-                                      suffixIcon: Column(
-                                        children: [
-                                          GestureDetector(
-                                            child: Icon(Icons.share),
-                                            onTap: () => onshare(widget
-                                                .list[indx]['tafsir_saadi']
-                                                .toString()),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          GestureDetector(
-                                            child: Icon(Icons.copy),
-                                            onTap: () => oncopy(widget
-                                                .list[indx]['tafsir_saadi']
-                                                .toString()),
-                                          ),
-                                        ],
-                                      ),
+
                                       labelText:
                                           'تفسير السعدي الاية رقم : ${widget.list[indx]['aya_num']} سورة : ${widget.list[indx]['sura']}',
                                       border: OutlineInputBorder(
@@ -292,34 +285,36 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                             BorderRadius.circular(10.0),
                                       ),
                                     ),
-                                    child: Text(widget.list[indx]
-                                            ['tafsir_saadi']
-                                        .toString()),
+                                    child:Column(children: [
+              Row(
+              children: [
+              GestureDetector(
+              child: Icon(Icons.share),
+              onTap: () => onshare(widget
+                  .list[indx]['tafsir_saadi']
+                  .toString()),
+              ),
+              SizedBox(
+              height: 10,
+              ),
+              GestureDetector(
+              child: Icon(Icons.copy),
+              onTap: () => oncopy(widget
+                  .list[indx]['tafsir_saadi']
+                  .toString()),
+              ),
+              ],
+              ),
+                                      Text(widget.list[indx]
+                                      ['tafsir_saadi']
+                                          .toString(),style: GoogleFonts.cairoPlay(fontSize: 21,fontWeight: FontWeight.w800),
+                                        textAlign: TextAlign.right,),  ],)
                                   ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.all(10),
                                   child: InputDecorator(
                                     decoration: InputDecoration(
-                                      suffixIcon: Column(
-                                        children: [
-                                          GestureDetector(
-                                            child: Icon(Icons.share),
-                                            onTap: () => onshare(widget
-                                                .list[indx]['tafsir_baghawi']
-                                                .toString()),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          GestureDetector(
-                                            child: Icon(Icons.copy),
-                                            onTap: () => oncopy(widget
-                                                .list[indx]['tafsir_baghawi']
-                                                .toString()),
-                                          ),
-                                        ],
-                                      ),
                                       labelText:
                                           'تفسير البغوي الاية رقم : ${widget.list[indx]['aya_num']} سورة : ${widget.list[indx]['sura']}',
                                       border: OutlineInputBorder(
@@ -327,9 +322,33 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                             BorderRadius.circular(10.0),
                                       ),
                                     ),
-                                    child: Text(widget.list[indx]
-                                            ['tafsir_baghawi']
-                                        .toString()),
+                                    child:Column(children: [
+
+              Column(
+              children: [
+              GestureDetector(
+              child: Icon(Icons.share),
+              onTap: () => onshare(widget
+                  .list[indx]['tafsir_baghawi']
+                  .toString()),
+              ),
+              SizedBox(
+              height: 10,
+              ),
+              GestureDetector(
+              child: Icon(Icons.copy),
+              onTap: () => oncopy(widget
+                  .list[indx]['tafsir_baghawi']
+                  .toString()),
+              ),
+              ],
+              ),
+
+                                      Text(widget.list[indx]
+                                      ['tafsir_baghawi']
+                                          .toString(),style: GoogleFonts.cairoPlay(fontSize: 21,fontWeight: FontWeight.w800),
+                                        textAlign: TextAlign.right,),
+              ],)
                                   ),
                                 ),
                                 Container(
@@ -363,7 +382,8 @@ class _SurahMoreDetailsState extends State<SurahMoreDetails> {
                                       ),
                                     ),
                                     child: Text(widget.list[indx]['e3rab_quran']
-                                        .toString()),
+                                        .toString(),style: GoogleFonts.cairoPlay(fontSize: 21,fontWeight: FontWeight.w800),
+                                      textAlign: TextAlign.right,),
                                   ),
                                 ),
                               ]),
